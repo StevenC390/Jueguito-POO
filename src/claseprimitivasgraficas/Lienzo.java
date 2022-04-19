@@ -39,7 +39,10 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     private boolean arriba;
     boolean yaiz;
     boolean yade;
-    
+    boolean ya = false;
+    boolean saliriz = false;
+    boolean salirde = false;
+    int c = 0;
 
     /**
      * Creates new form Lienzo
@@ -52,6 +55,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
         this.vidaPlayer = 500;
         this.yade = false;
         this.yaiz = false;
+
     }
 
     @Override
@@ -70,8 +74,8 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                 dibujarImagen(g, (Imagen) estaFigura);
             }
         }
-        g.drawString("Vida Nave = "+this.getVidaBoss(), 1400, 120);
-        g.drawString("Vida Player = "+this.vidaPlayer, 120, 120);
+        g.drawString("Vida Nave = " + this.getVidaBoss(), 1400, 120);
+        g.drawString("Vida Player = " + this.vidaPlayer, 120, 120);
     }
 
     public void dibujarCuadrado(Graphics g, Cuadrado square) {
@@ -133,175 +137,193 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
 
     @Override
     public void run() {
-        boolean ya=false;
-        boolean saliriz=false;
-        boolean salirde=false;
-        int c=0;
+
         while (this.isJugando()) {
             actualizarareas();
             for (FiguraGeometrica actual : this.getFiguras()) {
-                int random = ThreadLocalRandom.current().nextInt(0,10);
-                
-                if(actual instanceof Disparo && actual.getMaquina()==2){
-                    if(isArriba() == true){
-                        ((Disparo) actual).setY(((Disparo)actual).getY()-35);
-                        fronterasbala((Disparo)actual);
-                    }else if(isIzquierda() == true){
-                        ((Disparo) actual).setX(((Disparo)actual).getX()-35);
-                        fronterasbala((Disparo)actual);
-                    }else if(isDerecha() == true){
-                        ((Disparo) actual).setX(((Disparo)actual).getX()+35);
-                        fronterasbala((Disparo)actual);
-                    }
+                if (actual instanceof Disparo && actual.getMaquina() == 2) {
+                    operacionBalasPlayer((Disparo) actual);
                 }
                 if (actual instanceof FiguraEstandar) {
-                    if (actual.getMaquina()==0) {
-                        if(((FiguraEstandar) actual).getX()==400 || ((FiguraEstandar) actual).getX()==1200){
-                            ya=true;
-                        }
-                        this.setXn(sacarposicionactual((FiguraEstandar) actual, false));
-                        this.setYn(sacarposicionactual((FiguraEstandar) actual, true));
-                        if (actual.isDireccionX()) {
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+5);
-                        }else {
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-5);
-                        }
-                        validarFronteras((FiguraEstandar) actual);
-                        if(verificarColisiones(actual)){
-                            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
-                            this.setVidaBoss(((FiguraEstandar) actual).getVida());
-                            ((FiguraEstandar) actual).setVida(this.getVidaBoss());
-                            if(((FiguraEstandar) actual).getVida()==0){
-                                this.setJugando(false);
-                                JOptionPane.showMessageDialog(this, "Ganaste bro");
-                            }
-                        }
-                    }else if(actual.getMaquina()==1){
+                    if (actual.getMaquina() == 0) {
+                        operacionNaveBoss((FiguraEstandar) actual);
+                    } else if (actual.getMaquina() == 1) {
                         this.setXp(sacarposicionactual((FiguraEstandar) actual, false));
                         this.setYp(sacarposicionactual((FiguraEstandar) actual, true));
-                        
-                        if(verificarColisiones(actual)){
-                            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-10);
-                            this.vidaPlayer=(((FiguraEstandar) actual).getVida());
-                            ((FiguraEstandar) actual).setVida(this.vidaPlayer);
-                            if(((FiguraEstandar) actual).getVida()==0){
-                                
-                                this.setJugando(false);
-                                JOptionPane.showMessageDialog(this, "Perdiste bro");
-                            }
-                        }
-                    }else if(actual.getMaquina()==4){
-                        if (this.yaiz && actual.isDireccionX()) {
-                            if(saliriz==true){
-                                ((FiguraEstandar) actual).setVida(100);
-                            }
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-8);
-                            if(verificarColisiones(actual)){
-                                System.out.println(((FiguraEstandar) actual).getVida());
-                                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
-                                saliriz=false;
-                                if(((FiguraEstandar) actual).getVida()<=0){
-                                    yaiz=false;
-                                    saliriz=true;
-                                }
-                            }
-                        }else if(yaiz==false){
-                            ((FiguraEstandar) actual).setX(1600-50);
-                        }
-                    }else if(actual.getMaquina()==5){
-                        if (this.yade && actual.isDireccionX()) {
-                            if(salirde==true){
-                                ((FiguraEstandar) actual).setVida(100);
-                            }
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+8);
-                            if(verificarColisiones(actual)){
-                                System.out.println(((FiguraEstandar) actual).getVida());
-                                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
-                                salirde=false;
-                                if(((FiguraEstandar) actual).getVida()<=0){
-                                    yade=false;
-                                    salirde=true;
-                                }
-                            }
-                        }else if(yade==false){
-                            ((FiguraEstandar) actual).setX(0);
-                        }
+                        calcularVidaPlayer((FiguraEstandar) actual);
+                    } else if (actual.getMaquina() == 4) {
+                        operacionEnemigoDerecha((FiguraEstandar) actual);
+                    } else if (actual.getMaquina() == 5) {
+                        operacionEnemigoIzquierda((FiguraEstandar) actual);
                     }
-                    if(actual.getMaquina()==3){
-                        if (ya==false) {
-                            ((FiguraEstandar) actual).setX(xn);
-                        }else {
-                            ((Disparo) actual).setY(((Disparo)actual).getY()+8);
-                            if(fronterasbalaNave((Disparo)actual)){
-                                ya=false;
-                                ((FiguraEstandar) actual).setY(this.yn+100);
-                            }
-                        }
-                        if(verificarColisiones((FiguraEstandar) actual)){
-                            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
-                            if(((FiguraEstandar) actual).getVida()==0){
-                                ((FiguraEstandar) actual).setY(this.yn+100);
-                                ya=false;
-                            }
-                        }
-                    }
+                    operacionBalaEnemiga((FiguraEstandar) actual);
                     actual.actualizarArea();
                     repaint();
                     esperar(2);
                 }
-                                        
+
             }
         }
     }
-    
-    public void actualizarareas(){
-        for (FiguraGeometrica actual : this.getFiguras()){
+
+    public void operacionBalasPlayer(Disparo actual) {
+        if (isArriba() == true) {
+            ((Disparo) actual).setY(((Disparo) actual).getY() - 35);
+            fronterasbala((Disparo) actual);
+        } else if (isIzquierda() == true) {
+            ((Disparo) actual).setX(((Disparo) actual).getX() - 35);
+            fronterasbala((Disparo) actual);
+        } else if (isDerecha() == true) {
+            ((Disparo) actual).setX(((Disparo) actual).getX() + 35);
+            fronterasbala((Disparo) actual);
+        }
+    }
+
+    public void operacionNaveBoss(FiguraEstandar actual) {
+        if (((FiguraEstandar) actual).getX() == 400 || ((FiguraEstandar) actual).getX() == 1200) {
+            ya = true;
+        }
+        this.setXn(sacarposicionactual((FiguraEstandar) actual, false));
+        this.setYn(sacarposicionactual((FiguraEstandar) actual, true));
+        if (actual.isDireccionX()) {
+            ((FiguraEstandar) actual).setX(((FiguraEstandar) actual).getX() + 5);
+        } else {
+            ((FiguraEstandar) actual).setX(((FiguraEstandar) actual).getX() - 5);
+        }
+        validarFronteras((FiguraEstandar) actual);
+        if (verificarColisiones(actual)) {
+            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida() - 25);
+            this.setVidaBoss(((FiguraEstandar) actual).getVida());
+            ((FiguraEstandar) actual).setVida(this.getVidaBoss());
+            if (((FiguraEstandar) actual).getVida() == 0) {
+                this.setJugando(false);
+                JOptionPane.showMessageDialog(this, "Ganaste bro");
+            }
+        }
+    }
+
+    public void calcularVidaPlayer(FiguraEstandar actual) {
+        if (verificarColisiones(actual)) {
+            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida() - 10);
+            this.vidaPlayer = (((FiguraEstandar) actual).getVida());
+            ((FiguraEstandar) actual).setVida(this.vidaPlayer);
+            if (((FiguraEstandar) actual).getVida() == 0) {
+                this.setJugando(false);
+                JOptionPane.showMessageDialog(this, "Perdiste bro");
+            }
+        }
+    }
+
+    public void operacionEnemigoIzquierda(FiguraEstandar actual) {
+        if (this.yade && actual.isDireccionX()) {
+            if (salirde == true) {
+                ((FiguraEstandar) actual).setVida(100);
+            }
+            ((FiguraEstandar) actual).setX(((FiguraEstandar) actual).getX() + 8);
+            if (verificarColisiones(actual)) {
+                System.out.println(((FiguraEstandar) actual).getVida());
+                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida() - 25);
+                salirde = false;
+                if (((FiguraEstandar) actual).getVida() <= 0) {
+                    yade = false;
+                    salirde = true;
+                }
+            }
+        } else if (yade == false) {
+            ((FiguraEstandar) actual).setX(0);
+        }
+    }
+
+    public void operacionEnemigoDerecha(FiguraEstandar actual) {
+        if (this.yaiz && actual.isDireccionX()) {
+            if (saliriz == true) {
+                ((FiguraEstandar) actual).setVida(100);
+            }
+            ((FiguraEstandar) actual).setX(((FiguraEstandar) actual).getX() - 8);
+            if (verificarColisiones(actual)) {
+                System.out.println(((FiguraEstandar) actual).getVida());
+                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida() - 25);
+                saliriz = false;
+                if (((FiguraEstandar) actual).getVida() <= 0) {
+                    yaiz = false;
+                    saliriz = true;
+                }
+            }
+        } else if (yaiz == false) {
+            ((FiguraEstandar) actual).setX(1600 - 50);
+        }
+    }
+
+    public void operacionBalaEnemiga(FiguraEstandar actual) {
+        if (actual.getMaquina() == 3) {
+            if (ya == false) {
+                ((FiguraEstandar) actual).setX(xn);
+            } else {
+                ((Disparo) actual).setY(((Disparo) actual).getY() + 8);
+                if (fronterasbalaNave((Disparo) actual)) {
+                    ya = false;
+                    ((FiguraEstandar) actual).setY(this.yn + 100);
+                }
+            }
+            if (verificarColisiones((FiguraEstandar) actual)) {
+                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida() - 25);
+                if (((FiguraEstandar) actual).getVida() == 0) {
+                    ((FiguraEstandar) actual).setY(this.yn + 100);
+                    ya = false;
+                }
+            }
+        }
+    }
+
+    public void actualizarareas() {
+        for (FiguraGeometrica actual : this.getFiguras()) {
             actual.actualizarArea();
         }
     }
-    
-    public int sacarposicionactual(FiguraEstandar este,boolean xoy){
-        int posx=este.getX();
-        int posy=este.getY();
-        if(xoy == false){
+
+    public int sacarposicionactual(FiguraEstandar este, boolean xoy) {
+        int posx = este.getX();
+        int posy = este.getY();
+        if (xoy == false) {
             return posx;
-        }else{
+        } else {
             return posy;
         }
     }
 
-    
-    public void fronterasbala(Disparo laFigura){
-        if (laFigura.getY()<=0){
-            laFigura.setY(this.getYp()-15);
-            laFigura.setX(this.getXp()+5);
-        }else if (laFigura.getX()<=0){
-            laFigura.setY(this.getYp()-15);
-            laFigura.setX(this.getXp()+5);
-        }else if (laFigura.getX()>1600){
-            laFigura.setY(this.getYp()-15);
-            laFigura.setX(this.getXp()+5);
+    public void fronterasbala(Disparo laFigura) {
+        if (laFigura.getY() <= 0) {
+            laFigura.setY(this.getYp() - 15);
+            laFigura.setX(this.getXp() + 5);
+        } else if (laFigura.getX() <= 0) {
+            laFigura.setY(this.getYp() - 15);
+            laFigura.setX(this.getXp() + 5);
+        } else if (laFigura.getX() > 1600) {
+            laFigura.setY(this.getYp() - 15);
+            laFigura.setX(this.getXp() + 5);
         }
     }
-    public boolean fronterasbalaNave(Disparo laFigura){
-        boolean si=false;
-        if (laFigura.getY()>900){
-            laFigura.setY(yp+100);
-            si=true;
+
+    public boolean fronterasbalaNave(Disparo laFigura) {
+        boolean si = false;
+        if (laFigura.getY() > 900) {
+            laFigura.setY(yp + 100);
+            si = true;
         }
         return si;
     }
+
     public void validarFronteras(FiguraEstandar laFigura) {
-        if (laFigura.getX()+30 >= 1550) {
+        if (laFigura.getX() + 30 >= 1550) {
             laFigura.setDireccionX(false);
-            yaiz=true;
-            yade=false;
+            yaiz = true;
+            yade = false;
         } else if (laFigura.getX() <= 0) {
             laFigura.setDireccionX(true);
-            yaiz=false;
-            yade=true;
+            yaiz = false;
+            yade = true;
         }
-        if (laFigura.getY()+30 >= 900) {
+        if (laFigura.getY() + 30 >= 900) {
             laFigura.setDireccionY(true);
         } else if (laFigura.getY() <= 0) {
             laFigura.setDireccionY(false);
@@ -315,13 +337,13 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
 
         }
     }
-    
-    public boolean verificarColisiones(FiguraGeometrica jugador){
-        boolean res=false;
-        int i=0;
-        while(i<this.getFiguras().size() && !res){
-            if(jugador!=this.getFiguras().get(i) && jugador.getArea().intersects(this.getFiguras().get(i).getArea())){
-                res=true;
+
+    public boolean verificarColisiones(FiguraGeometrica jugador) {
+        boolean res = false;
+        int i = 0;
+        while (i < this.getFiguras().size() && !res) {
+            if (jugador != this.getFiguras().get(i) && jugador.getArea().intersects(this.getFiguras().get(i).getArea())) {
+                res = true;
             }
             i++;
         }
@@ -341,8 +363,6 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     public void setJugando(boolean jugando) {
         this.jugando = jugando;
     }
-
-    
 
     /**
      * @return the vidaBoss

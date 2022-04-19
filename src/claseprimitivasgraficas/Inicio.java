@@ -43,8 +43,6 @@ public class Inicio extends javax.swing.JFrame {
         this.enemigode = new Imagen("src/Imagenes/Nave.png", 50, 50, 0, 800-30, 100, Color.blue, Color.green, true, false, 5);
         //Imagen bla = new Imagen("src/Imagenes/rocket-league.png", 60, 60, 600, 300, 100000000, false, false, 0);
         //this.lienzo1.getFiguras().add(bla);
-        this.lienzo1.setSize(1900,1000);
-        
         this.lienzo1.getFiguras().add(nave);
         this.lienzo1.getFiguras().add(enemigo1);
         this.lienzo1.getFiguras().add(enemigoiz);
