@@ -24,16 +24,6 @@ public class Cuadrado extends FiguraEstandar{
         this.lado = lado;
     }
 
-    
-
-    
-    
-    
-
-    
-    
-    
-
     /**
      * @return the lado
      */

@@ -24,11 +24,6 @@ public class Imagen extends FiguraEstandar{
         this.alto = alto;
     }
 
-    
-
-    
-    
-
     /**
      * @return the ruta
      */

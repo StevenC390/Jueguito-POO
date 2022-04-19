@@ -37,8 +37,8 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     private boolean izquierda;
     private boolean derecha;
     private boolean arriba;
-    boolean yaiz=false;
-    boolean yade=false;
+    boolean yaiz;
+    boolean yade;
     
 
     /**
@@ -50,6 +50,8 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
         this.jugando = false;
         this.vidaBoss = 10000;
         this.vidaPlayer = 500;
+        this.yade = false;
+        this.yaiz = false;
     }
 
     @Override
@@ -193,7 +195,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                             if(saliriz==true){
                                 ((FiguraEstandar) actual).setVida(100);
                             }
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-5);
+                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-8);
                             if(verificarColisiones(actual)){
                                 System.out.println(((FiguraEstandar) actual).getVida());
                                 ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
@@ -211,7 +213,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                             if(salirde==true){
                                 ((FiguraEstandar) actual).setVida(100);
                             }
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+5);
+                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+8);
                             if(verificarColisiones(actual)){
                                 System.out.println(((FiguraEstandar) actual).getVida());
                                 ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
