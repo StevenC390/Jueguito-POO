@@ -35,8 +35,8 @@ public class Inicio extends javax.swing.JFrame {
         System.out.println(random);
         //Cuadrado nave= new Cuadrado(30, 0, 0,1000, Color.blue, Color.green, true, false, 0);
         //this.player = new Cuadrado(30, 640/2, 360-31,100, Color.blue, Color.red, true, true, 1);
-        this.nave = new Imagen("src/Imagenes/Nave.png", 100, 100, 1600/2, 0, 1000,Color.BLACK,Color.BLACK, true, false, 0);
-        this.player = new Imagen("src/Imagenes/rocket-league.png", 100, 100, 1600/2, 800, 100,Color.BLACK,Color.BLACK, true, true, 1);
+        this.nave = new Imagen("src/Imagenes/Nave.png", 100, 100, 1600/2, 0, 10000,Color.BLACK,Color.BLACK, true, false, 0);
+        this.player = new Imagen("src/Imagenes/rocket-league.png", 100, 100, 1600/2, 800, 500,Color.BLACK,Color.BLACK, true, true, 1);
         this.bala= new Disparo(25,10, this.player.getX()+5, this.player.getY()-15,50, Color.black, Color.black, true, true, 2);
         this.enemigo1 = new Disparo(10, 30, this.nave.getX()-50, this.nave.getY()+100, 250, Color.blue, Color.green, true, true, 3);
         this.enemigoiz = new Imagen("src/Imagenes/Nave.png", 50, 50, 1600-50, 800-30, 100, Color.blue, Color.green, true, false, 4);

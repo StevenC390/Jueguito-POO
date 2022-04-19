@@ -33,6 +33,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     private int xn;
     private int yn;
     private int vidaBoss;
+    int vidaPlayer;
     private boolean izquierda;
     private boolean derecha;
     private boolean arriba;
@@ -47,7 +48,8 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
         initComponents();
         this.figuras = new LinkedList<>();
         this.jugando = false;
-        this.vidaBoss = 1000;
+        this.vidaBoss = 10000;
+        this.vidaPlayer = 500;
     }
 
     @Override
@@ -67,6 +69,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
             }
         }
         g.drawString("Vida Nave = "+this.getVidaBoss(), 1400, 120);
+        g.drawString("Vida Player = "+this.vidaPlayer, 120, 120);
     }
 
     public void dibujarCuadrado(Graphics g, Cuadrado square) {
@@ -130,6 +133,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     public void run() {
         boolean ya=false;
         boolean saliriz=false;
+        boolean salirde=false;
         int c=0;
         while (this.isJugando()) {
             actualizarareas();
@@ -173,6 +177,17 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                     }else if(actual.getMaquina()==1){
                         this.setXp(sacarposicionactual((FiguraEstandar) actual, false));
                         this.setYp(sacarposicionactual((FiguraEstandar) actual, true));
+                        
+                        if(verificarColisiones(actual)){
+                            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-10);
+                            this.vidaPlayer=(((FiguraEstandar) actual).getVida());
+                            ((FiguraEstandar) actual).setVida(this.vidaPlayer);
+                            if(((FiguraEstandar) actual).getVida()==0){
+                                
+                                this.setJugando(false);
+                                JOptionPane.showMessageDialog(this, "Perdiste bro");
+                            }
+                        }
                     }else if(actual.getMaquina()==4){
                         if (this.yaiz && actual.isDireccionX()) {
                             if(saliriz==true){
@@ -190,6 +205,24 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                             }
                         }else if(yaiz==false){
                             ((FiguraEstandar) actual).setX(1600-50);
+                        }
+                    }else if(actual.getMaquina()==5){
+                        if (this.yade && actual.isDireccionX()) {
+                            if(salirde==true){
+                                ((FiguraEstandar) actual).setVida(100);
+                            }
+                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+5);
+                            if(verificarColisiones(actual)){
+                                System.out.println(((FiguraEstandar) actual).getVida());
+                                ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
+                                salirde=false;
+                                if(((FiguraEstandar) actual).getVida()<=0){
+                                    yade=false;
+                                    salirde=true;
+                                }
+                            }
+                        }else if(yade==false){
+                            ((FiguraEstandar) actual).setX(0);
                         }
                     }
                     if(actual.getMaquina()==3){
@@ -238,14 +271,14 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     
     public void fronterasbala(Disparo laFigura){
         if (laFigura.getY()<=0){
-            laFigura.setY(this.getYp());
-            laFigura.setX(this.getXp());
+            laFigura.setY(this.getYp()-15);
+            laFigura.setX(this.getXp()+5);
         }else if (laFigura.getX()<=0){
-            laFigura.setY(this.getYp());
-            laFigura.setX(this.getXp());
+            laFigura.setY(this.getYp()-15);
+            laFigura.setX(this.getXp()+5);
         }else if (laFigura.getX()>1600){
-            laFigura.setY(this.getYp());
-            laFigura.setX(this.getXp());
+            laFigura.setY(this.getYp()-15);
+            laFigura.setX(this.getXp()+5);
         }
     }
     public boolean fronterasbalaNave(Disparo laFigura){
