@@ -45,7 +45,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
         initComponents();
         this.figuras = new LinkedList<>();
         this.jugando = false;
-        this.vidaBoss = 10000;
+        this.vidaBoss = 1000;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                 dibujarImagen(g, (Imagen) estaFigura);
             }
         }
-        g.drawString(""+this.getVidaBoss(), 640, 120);
+        g.drawString("Vida Nave = "+this.getVidaBoss(), 1400, 120);
     }
 
     public void dibujarCuadrado(Graphics g, Cuadrado square) {
@@ -126,31 +126,36 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
 
     @Override
     public void run() {
-        
+        boolean ya=false;
+        int c=0;
         while (this.isJugando()) {
             actualizarareas();
             for (FiguraGeometrica actual : this.getFiguras()) {
-                if(actual instanceof Disparo){
+                int random = ThreadLocalRandom.current().nextInt(0,10);
+                
+                if(actual instanceof Disparo && actual.getMaquina()==2){
                     if(isArriba() == true){
-                        ((Disparo) actual).setY(((Disparo)actual).getY()-10);
+                        ((Disparo) actual).setY(((Disparo)actual).getY()-20);
                         fronterasbala((Disparo)actual);
                     }else if(isIzquierda() == true){
-                        ((Disparo) actual).setX(((Disparo)actual).getX()-10);
+                        ((Disparo) actual).setX(((Disparo)actual).getX()-20);
                         fronterasbala((Disparo)actual);
                     }else if(isDerecha() == true){
-                        ((Disparo) actual).setX(((Disparo)actual).getX()+10);
+                        ((Disparo) actual).setX(((Disparo)actual).getX()+20);
                         fronterasbala((Disparo)actual);
                     }
                 }
                 if (actual instanceof FiguraEstandar) {
-                    if (actual.getMaquina()==0 || actual.getMaquina()==3) {
+                    if (actual.getMaquina()==0) {
+                        if(((FiguraEstandar) actual).getX()==400 || ((FiguraEstandar) actual).getX()==1200){
+                            ya=true;
+                        }
                         this.setXn(sacarposicionactual((FiguraEstandar) actual, false));
                         this.setYn(sacarposicionactual((FiguraEstandar) actual, true));
                         if (actual.isDireccionX()) {
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+4);
-                            int random = ThreadLocalRandom.current().nextInt(0,100);
+                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()+5);
                         }else {
-                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-4);
+                            ((FiguraEstandar) actual).setX(((FiguraEstandar)actual).getX()-5);
                         }
                         validarFronteras((FiguraEstandar) actual);
                         if(verificarColisiones(actual)){
@@ -162,10 +167,28 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
                                 JOptionPane.showMessageDialog(this, "Ganaste bro");
                             }
                         }
-                        
                     }else if(actual.getMaquina()==1){
+                        
                         this.setXp(sacarposicionactual((FiguraEstandar) actual, false));
                         this.setYp(sacarposicionactual((FiguraEstandar) actual, true));
+                    }
+                    if(actual.getMaquina()==3){
+                        if (ya==false) {
+                            ((FiguraEstandar) actual).setX(xn);
+                        }else {
+                            ((Disparo) actual).setY(((Disparo)actual).getY()+8);
+                            if(fronterasEnemigos((Disparo)actual)){
+                                ya=false;
+                                ((FiguraEstandar) actual).setY(this.yn+100);
+                            }
+                        }
+                        if(verificarColisiones((FiguraEstandar) actual)){
+                            ((FiguraEstandar) actual).setVida(((FiguraEstandar) actual).getVida()-25);
+                            if(((FiguraEstandar) actual).getVida()==0){
+                                ((FiguraEstandar) actual).setY(this.yn+100);
+                                ya=false;
+                            }
+                        }
                     }
                     actual.actualizarArea();
                     repaint();
@@ -195,23 +218,31 @@ public class Lienzo extends javax.swing.JPanel implements Runnable {
     
     public void fronterasbala(Disparo laFigura){
         if (laFigura.getY()<=0){
-            laFigura.setY(this.getY());
-            laFigura.setX(this.getX());
+            laFigura.setY(this.getYp());
+            laFigura.setX(this.getXp());
         }else if (laFigura.getX()<=0){
-            laFigura.setY(this.getY());
-            laFigura.setX(this.getX());
-        }else if (laFigura.getX()>640){
-            laFigura.setY(this.getY());
-            laFigura.setX(this.getX());
+            laFigura.setY(this.getYp());
+            laFigura.setX(this.getXp());
+        }else if (laFigura.getX()>1600){
+            laFigura.setY(this.getYp());
+            laFigura.setX(this.getXp());
         }
     }
+    public boolean fronterasEnemigos(Disparo laFigura){
+        boolean si=false;
+        if (laFigura.getY()>900){
+            laFigura.setY(yp+100);
+            si=true;
+        }
+        return si;
+    }
     public void validarFronteras(FiguraEstandar laFigura) {
-        if (laFigura.getX()+30 >= 640) {
+        if (laFigura.getX()+30 >= 1550) {
             laFigura.setDireccionX(false);
         } else if (laFigura.getX() <= 0) {
             laFigura.setDireccionX(true);
         }
-        if (laFigura.getY()+30 >= 480) {
+        if (laFigura.getY()+30 >= 900) {
             laFigura.setDireccionY(true);
         } else if (laFigura.getY() <= 0) {
             laFigura.setDireccionY(false);
